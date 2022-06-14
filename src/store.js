@@ -1,11 +1,13 @@
 import { useEffect, useReducer } from "react";
+import isSameShallowly from "./shallow";
+import { useEvent } from "./useEvent";
 
 class Store extends EventTarget {
   constructor(stateCreator) {
     super();
     this.state = stateCreator(this.setState, this.getState);
   }
-  
+
   static stateUpdateEvent = new Event("update");
 
   setState = (newState) => {
@@ -21,16 +23,28 @@ class Store extends EventTarget {
 export const create = (stateCreator) => {
   const store = new Store(stateCreator);
 
-  const useStore = () => {
-    const [, rerender] = useReducer((n) => n + 1, 0);
+  const reducerForSelector = (oldSelection, newSelection) => {
+    return isSameShallowly(oldSelection, newSelection) ? oldSelection : newSelection
+  }
+
+  const useStore = (selector) => {
+    const [selectedState, dispatch] = useReducer(
+      selector ? reducerForSelector : (n => n + 1),
+      selector ? store.getState() : 0,
+      selector
+    );
+
+    const onStateUpdate = useEvent(() => {
+      dispatch(selector?.(store.getState()))
+    })
 
     useEffect(() => {
-      store.addEventListener(Store.stateUpdateEvent.type, rerender);
+      store.addEventListener(Store.stateUpdateEvent.type, onStateUpdate);
       return () =>
-        store.removeEventListener(Store.stateUpdateEvent.type, rerender);
+        store.removeEventListener(Store.stateUpdateEvent.type, onStateUpdate);
     }, []);
 
-    return store.state;
+    return selector ? selectedState : store.getState();
   };
 
   return useStore;

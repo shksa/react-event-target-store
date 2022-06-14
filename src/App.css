@@ -8,37 +8,37 @@
   --border: 1px solid black;
 }
 
-.app {
+.grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   grid-column-gap: 1rem;
   margin: 1rem;
 }
 
-.app > section {
+.grid > section {
   border: var(--border);
 }
 
-.app > section > h2 {
+.grid > section > h2 {
   margin: 0.5rem;
 }
 
-.app > section > ul {
+.grid > section > ul {
   margin-left: 2rem;
 }
 
-.app > section > ul > li {
+.grid > section > ul > li {
   margin: 0.5rem;
 }
 
-.app > section > ul > li {
+.grid > section > ul > li {
   display: grid;
   grid-column-gap: 0.5rem;
   grid-template-columns: 1fr auto;
   align-items: center;
 }
 
-.app > section > ul > li > button {
+.grid > section > ul > li > button {
   cursor: pointer;
   padding: 0.125rem;
 }
