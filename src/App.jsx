@@ -1,77 +1,27 @@
-import { useEffect, useReducer } from "react";
 import { create } from "./store";
 import "./App.css";
-
-const movies = [
-  {
-    id: 1,
-    title: "Navigator, The"
-  },
-  {
-    id: 2,
-    title: "Jim Jefferies: Alcoholocaust"
-  },
-  {
-    id: 3,
-    title: "Puzzlehead"
-  },
-  {
-    id: 4,
-    title: "The Big Cube"
-  },
-  {
-    id: 5,
-    title: "Journey to the Center of the Earth"
-  },
-  {
-    id: 6,
-    title: "Asphalt Jungle, The"
-  },
-  {
-    id: 7,
-    title: "Day of the Animals"
-  },
-  {
-    id: 8,
-    title: "Sterile Cuckoo, The"
-  },
-  {
-    id: 9,
-    title: "American Ninja 2: The Confrontation"
-  },
-  {
-    id: 10,
-    title: "The Testimony"
-  }
-];
+import { movies } from "./data";
 
 const useStore = create((set, get) => ({
   listA: movies,
   listB: [],
-  moveFromListAToListB: (itemId) => {
-    const { listA, listB } = get();
-    const itemIndex = listA.findIndex((item) => item.id === itemId);
-    const newListA = listA.filter(({ id }) => id !== itemId);
+  move: ({itemId, from, to}) => {
+    const fromList = get()[from]
+    const toList = get()[to]
+    const itemIndex = fromList.findIndex((item) => item.id === itemId);
+    const newFromList = fromList.filter(({ id }) => id !== itemId);
+    const newToList = toList.concat(fromList[itemIndex])
     set({
-      listB: [...listB, listA[itemIndex]],
-      listA: newListA
-    });
-  },
-  moveFromListBToListA: (itemId) => {
-    const { listA, listB } = get();
-    const itemIndex = listB.findIndex((item) => item.id === itemId);
-    const newListB = listB.filter(({ id }) => id !== itemId);
-    set({
-      listA: [...listA, listB[itemIndex]],
-      listB: newListB
+      [from]: newFromList,
+      [to]: newToList
     });
   }
 }));
 
 function ListA() {
   const store = useStore();
-  const onClick = (id) => {
-    store.moveFromListAToListB(id);
+  const onClick = (itemId) => {
+    store.move({itemId, from: 'listA', to: 'listB'})
   };
   return (
     <section>
@@ -90,8 +40,8 @@ function ListA() {
 
 function ListB() {
   const store = useStore();
-  const onClick = (id) => {
-    store.moveFromListBToListA(id);
+  const onClick = (itemId) => {
+    store.move({itemId, from: 'listB', to: 'listA'})
   };
   return (
     <section>
