@@ -5,11 +5,14 @@ class Store extends EventTarget {
     super();
     this.state = stateCreator(this.setState, this.getState);
   }
+  
   static stateUpdateEvent = new Event("update");
+
   setState = (newState) => {
     Object.assign(this.state, newState);
     this.dispatchEvent(Store.stateUpdateEvent);
   };
+
   getState = () => {
     return this.state;
   };

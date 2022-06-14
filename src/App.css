@@ -35,10 +35,10 @@
   display: grid;
   grid-column-gap: 0.5rem;
   grid-template-columns: 1fr auto;
+  align-items: center;
 }
 
 .app > section > ul > li > button {
-  height: min-content;
   cursor: pointer;
   padding: 0.125rem;
 }
