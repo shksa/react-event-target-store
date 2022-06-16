@@ -10,6 +10,11 @@ class Store extends EventTarget {
 
   static stateUpdateEvent = new Event("update");
 
+  subscribe = (listener) => {
+    this.addEventListener(Store.stateUpdateEvent.type, listener)
+    return () => this.removeEventListener(Store.stateUpdateEvent.type, listener)
+  }
+
   setState = (newState) => {
     Object.assign(this.state, newState);
     this.dispatchEvent(Store.stateUpdateEvent);
@@ -23,28 +28,27 @@ class Store extends EventTarget {
 export const create = (stateCreator) => {
   const store = new Store(stateCreator);
 
-  const reducerForSelector = (oldSelection, newSelection) => {
-    return isSameShallowly(oldSelection, newSelection) ? oldSelection : newSelection
-  }
+  const defaultSelector = (state) => ({...state})
 
-  const useStore = (selector) => {
+  const useStore = (selector = defaultSelector) => {
     const [selectedState, dispatch] = useReducer(
-      selector ? reducerForSelector : (n => n + 1),
-      selector ? store.getState() : 0,
+      (old, newd) => {
+        if (isSameShallowly(old, newd) && selector !== defaultSelector) {
+          return old
+        }
+        return newd
+      },
+      store.getState(),
       selector
     );
 
     const onStateUpdate = useEvent(() => {
-      dispatch(selector?.(store.getState()))
+      dispatch(selector(store.getState()))
     })
 
-    useEffect(() => {
-      store.addEventListener(Store.stateUpdateEvent.type, onStateUpdate);
-      return () =>
-        store.removeEventListener(Store.stateUpdateEvent.type, onStateUpdate);
-    }, []);
+    useEffect(() => store.subscribe(onStateUpdate), []);
 
-    return selector ? selectedState : store.getState();
+    return selectedState;
   };
 
   return useStore;

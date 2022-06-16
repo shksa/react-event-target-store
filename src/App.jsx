@@ -71,7 +71,7 @@ function ListC() {
   })
   return (
     <section>
-      <h2>List C</h2>
+      <div><h2>List C</h2> rendered {renderedCountRef.current} times</div>
       <ul>
         {listC.map(({ id, title }) => (
           <li key={id}>
@@ -80,7 +80,6 @@ function ListC() {
           </li>
         ))}
       </ul>
-      <div>rendered {renderedCountRef.current} times</div>
     </section>
   );
 }

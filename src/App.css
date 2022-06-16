@@ -19,7 +19,7 @@
   border: var(--border);
 }
 
-.grid > section > h2 {
+.grid > section h2 {
   margin: 0.5rem;
 }
 
